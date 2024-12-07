@@ -73,6 +73,7 @@ public class TraineeService {
         return convertTraineeToTraineeUpdateResponse(updatedTrainee);
     }
 
+    @Transactional
     public void deleteTrainee(String username) {
         log.info("Deleting trainee: {}", username);
         Trainee trainee = traineeRepository.findByUsername(username)

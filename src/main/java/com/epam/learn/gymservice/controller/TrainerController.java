@@ -151,7 +151,7 @@ public class TrainerController {
     }
 
     public ResponseEntity<String> addTraining(Throwable throwable) {
-        return new ResponseEntity<>("Trainer workload service unavailable!", HttpStatus.CONFLICT);
+        return new ResponseEntity<>("Trainer workload service unavailable!", HttpStatus.REQUEST_TIMEOUT);
     }
 
 }
