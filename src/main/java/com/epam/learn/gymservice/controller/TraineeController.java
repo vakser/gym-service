@@ -101,7 +101,7 @@ public class TraineeController {
             @ApiResponse(responseCode = "403", description = "Access to requested resource forbidden", content = @Content)
     })
     @DeleteMapping("/{username}")
-    @CircuitBreaker(name = "trainerWorkloadService", fallbackMethod = "deleteTraineeProfile")
+//    @CircuitBreaker(name = "trainerWorkloadService", fallbackMethod = "deleteTraineeProfile")
     public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username, @RequestHeader HttpHeaders headers) {
         String token = authenticationFacade.extractAuthToken(headers);
         if (!token.isEmpty() && jwtTokenUtil.getUsernameFromToken(token).equals(username)) {
@@ -112,9 +112,9 @@ public class TraineeController {
         }
     }
 
-    public ResponseEntity<String> deleteTraineeProfile(Throwable throwable) {
-        return new ResponseEntity<>("Trainer workload service unavailable!", HttpStatus.REQUEST_TIMEOUT);
-    }
+//    public ResponseEntity<String> deleteTraineeProfile(Throwable throwable) {
+//        return new ResponseEntity<>("Trainer workload service unavailable!", HttpStatus.REQUEST_TIMEOUT);
+//    }
 
     @Operation(summary = "Change Trainee Activation Status", description = "Is used to change trainee activation status")
     @ApiResponses(value = {

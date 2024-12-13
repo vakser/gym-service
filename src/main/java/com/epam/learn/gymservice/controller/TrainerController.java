@@ -133,7 +133,7 @@ public class TrainerController {
             @ApiResponse(responseCode = "403", description = "Access to requested resource forbidden", content = @Content)
     })
     @PostMapping("/{username}/trainings")
-    @CircuitBreaker(name = "trainerWorkloadService", fallbackMethod = "addTraining")
+//    @CircuitBreaker(name = "trainerWorkloadService", fallbackMethod = "addTraining")
     public ResponseEntity<String> addTraining(@PathVariable String username,
                                             @Valid @RequestBody AddTrainingRequest addTrainingRequest,
                                             @RequestHeader HttpHeaders headers) {
@@ -150,8 +150,8 @@ public class TrainerController {
         }
     }
 
-    public ResponseEntity<String> addTraining(Throwable throwable) {
-        return new ResponseEntity<>("Trainer workload service unavailable!", HttpStatus.REQUEST_TIMEOUT);
-    }
+//    public ResponseEntity<String> addTraining(Throwable throwable) {
+//        return new ResponseEntity<>("Trainer workload service unavailable!", HttpStatus.REQUEST_TIMEOUT);
+//    }
 
 }
