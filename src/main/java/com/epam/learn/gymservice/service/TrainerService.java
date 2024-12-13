@@ -9,7 +9,6 @@ import com.epam.learn.gymservice.entity.*;
 import com.epam.learn.gymservice.exception.TraineeNotFoundException;
 import com.epam.learn.gymservice.exception.TrainerNotFoundException;
 import com.epam.learn.gymservice.exception.TrainingTypeNotFoundException;
-import com.epam.learn.gymservice.feign.TrainerWorkloadServiceClient;
 import com.epam.learn.gymservice.specification.TrainerTrainingSpecification;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +30,8 @@ public class TrainerService {
     private final TrainingRepository trainingRepository;
     private final TraineeRepository traineeRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TrainerWorkloadServiceClient workloadServiceClient;
+//    private final TrainerWorkloadServiceClient workloadServiceClient;
+    private final WorkloadMessageProducer workloadMessageProducer;
 
     @Transactional
     public UserResponse createTrainer(TrainerRegistrationRequest trainerRegistrationRequest) {
@@ -136,7 +136,8 @@ public class TrainerService {
                 addTrainingRequest.getTrainingDuration(),
                 "ADD"
         );
-        workloadServiceClient.updateTrainerWorkload(workloadRequest);
+//        workloadServiceClient.updateTrainerWorkload(workloadRequest);
+        workloadMessageProducer.sendWorkloadMessage(workloadRequest);
     }
 
     private TrainerTrainingResponse convertTrainingToTrainerTrainingResponse(Training training) {
