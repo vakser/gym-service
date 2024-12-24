@@ -5,7 +5,6 @@ import com.epam.learn.gymservice.facade.AuthenticationFacade;
 import com.epam.learn.gymservice.jwt.JwtTokenUtil;
 import com.epam.learn.gymservice.service.CustomUserDetailsService;
 import com.epam.learn.gymservice.service.TrainerService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -133,7 +132,6 @@ public class TrainerController {
             @ApiResponse(responseCode = "403", description = "Access to requested resource forbidden", content = @Content)
     })
     @PostMapping("/{username}/trainings")
-//    @CircuitBreaker(name = "trainerWorkloadService", fallbackMethod = "addTraining")
     public ResponseEntity<String> addTraining(@PathVariable String username,
                                             @Valid @RequestBody AddTrainingRequest addTrainingRequest,
                                             @RequestHeader HttpHeaders headers) {
@@ -149,9 +147,5 @@ public class TrainerController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
-
-//    public ResponseEntity<String> addTraining(Throwable throwable) {
-//        return new ResponseEntity<>("Trainer workload service unavailable!", HttpStatus.REQUEST_TIMEOUT);
-//    }
 
 }

@@ -133,10 +133,8 @@ public class TrainerService {
                 trainer.getUser().getLastName(),
                 trainer.getUser().getIsActive(),
                 addTrainingRequest.getTrainingDate(),
-                addTrainingRequest.getTrainingDuration(),
-                "ADD"
+                addTrainingRequest.getTrainingDuration()
         );
-//        workloadServiceClient.updateTrainerWorkload(workloadRequest);
         workloadMessageProducer.sendWorkloadMessage(workloadRequest);
     }
 

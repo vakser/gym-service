@@ -18,5 +18,5 @@ public class TrainerWorkloadRequest {
     private boolean isActive;
     private LocalDate trainingDate;
     private Integer trainingDuration;
-    private String actionType; // ADD or DELETE
+
 }

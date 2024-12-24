@@ -30,8 +30,6 @@ public class TraineeService {
     private final TrainingRepository trainingRepository;
     private final TrainerRepository trainerRepository;
     private final PasswordEncoder passwordEncoder;
-//    private final TrainerWorkloadServiceClient workloadServiceClient;
-    private final WorkloadMessageProducer workloadMessageProducer;
 
     @Transactional
     public UserResponse createTrainee(TraineeRegistrationRequest traineeRegistrationRequest) {
@@ -78,22 +76,8 @@ public class TraineeService {
         log.info("Deleting trainee: {}", username);
         Trainee trainee = traineeRepository.findByUsername(username)
                 .orElseThrow(() -> new TraineeNotFoundException("Trainee " + username + " not found"));
-        List<Training> traineeTrainings = trainee.getTrainings();
         traineeRepository.delete(trainee);
         log.info("Successfully deleted trainee: {}", username);
-        for (Training training : traineeTrainings) {
-            TrainerWorkloadRequest workloadRequest = new TrainerWorkloadRequest(
-                    training.getTrainer().getUser().getUsername(),
-                    training.getTrainer().getUser().getFirstName(),
-                    training.getTrainer().getUser().getLastName(),
-                    training.getTrainer().getUser().getIsActive(),
-                    training.getTrainingDate(),
-                    training.getTrainingDuration(),
-                    "DELETE"
-            );
-//            workloadServiceClient.updateTrainerWorkload(workloadRequest);
-            workloadMessageProducer.sendWorkloadMessage(workloadRequest);
-        }
     }
 
     public GetTraineeProfileResponse selectTrainee(String username) {

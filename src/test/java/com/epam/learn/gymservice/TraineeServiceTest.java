@@ -4,7 +4,6 @@ import com.epam.learn.gymservice.dao.TraineeRepository;
 import com.epam.learn.gymservice.dao.TrainingRepository;
 import com.epam.learn.gymservice.dto.*;
 import com.epam.learn.gymservice.entity.*;
-import com.epam.learn.gymservice.feign.TrainerWorkloadServiceClient;
 import com.epam.learn.gymservice.service.TraineeService;
 import com.epam.learn.gymservice.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,9 +39,6 @@ public class TraineeServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private TrainerWorkloadServiceClient trainerWorkloadServiceClient;
 
 
     private Trainee trainee;
