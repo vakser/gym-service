@@ -5,7 +5,6 @@ import com.epam.learn.gymservice.facade.AuthenticationFacade;
 import com.epam.learn.gymservice.jwt.JwtTokenUtil;
 import com.epam.learn.gymservice.service.CustomUserDetailsService;
 import com.epam.learn.gymservice.service.TraineeService;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import io.swagger.v3.oas.annotations.Operation;
@@ -101,7 +100,6 @@ public class TraineeController {
             @ApiResponse(responseCode = "403", description = "Access to requested resource forbidden", content = @Content)
     })
     @DeleteMapping("/{username}")
-//    @CircuitBreaker(name = "trainerWorkloadService", fallbackMethod = "deleteTraineeProfile")
     public ResponseEntity<Void> deleteTraineeProfile(@PathVariable String username, @RequestHeader HttpHeaders headers) {
         String token = authenticationFacade.extractAuthToken(headers);
         if (!token.isEmpty() && jwtTokenUtil.getUsernameFromToken(token).equals(username)) {
@@ -111,10 +109,6 @@ public class TraineeController {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
     }
-
-//    public ResponseEntity<String> deleteTraineeProfile(Throwable throwable) {
-//        return new ResponseEntity<>("Trainer workload service unavailable!", HttpStatus.REQUEST_TIMEOUT);
-//    }
 
     @Operation(summary = "Change Trainee Activation Status", description = "Is used to change trainee activation status")
     @ApiResponses(value = {
