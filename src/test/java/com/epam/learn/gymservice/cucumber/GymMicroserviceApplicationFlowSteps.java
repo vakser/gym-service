@@ -23,6 +23,8 @@ import java.util.Optional;
 public class GymMicroserviceApplicationFlowSteps {
     private ResponseEntity<ProfileCreatedResponse> trainerProfileCreatedResponse;
     private ResponseEntity<ProfileCreatedResponse> traineeProfileCreatedResponse;
+    private ResponseEntity<Void> trainerActivationStatusResponse;
+    private ResponseEntity<Void> traineeActivationStatusResponse;
     private ResponseEntity<GetTrainerProfileResponse> trainerProfileResponse;
     private ResponseEntity<GetTraineeProfileResponse> traineeProfileResponse;
     private JSONObject trainerRegistrationRequestJson;
@@ -199,5 +201,57 @@ public class GymMicroserviceApplicationFlowSteps {
                 "Http Status Code 200 OK should have been returned");
         Assertions.assertEquals("John", traineeProfileResponse.getBody().getFirstName());
         Assertions.assertEquals("Jones", traineeProfileResponse.getBody().getLastName());
+    }
+
+    @And("the status of trainer {string} is inactive")
+    public void theStatusOfTrainerIsInactive(String username) throws JSONException {
+        Trainer trainer = trainerRepository.findByUsername(username).get();
+        Assertions.assertFalse(trainer.getUser().getIsActive());
+    }
+
+    @When("trainer {string} sends a request with valid JWT token to change the status to active")
+    public void trainerSendsARequestWithValidJWTTokenToChangeTheStatusToActive(String username) throws JSONException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + tokenOfLoggedInTrainer);
+        JSONObject changeActivationStatusRequestBody = new JSONObject();
+        changeActivationStatusRequestBody.put("username", username);
+        changeActivationStatusRequestBody.put("isActive", true);
+        HttpEntity<String> requestEntity = new HttpEntity<>(changeActivationStatusRequestBody.toString(), headers);
+        trainerActivationStatusResponse = restTemplate.exchange("http://localhost:8080/api/trainers/" +
+                username, HttpMethod.PATCH, requestEntity, Void.class);
+    }
+
+    @Then("the status of trainer {string} is changed to active")
+    public void theStatusOfTrainerIsChangedToActive(String username) {
+        Assertions.assertEquals(HttpStatus.OK, trainerActivationStatusResponse.getStatusCode());
+        Trainer trainer = trainerRepository.findByUsername(username).get();
+        Assertions.assertTrue(trainer.getUser().getIsActive());
+    }
+
+    @And("the status of trainee {string} is inactive")
+    public void theStatusOfTraineeIsInactive(String username) {
+        Trainee trainee = traineeRepository.findByUsername(username).get();
+        Assertions.assertFalse(trainee.getUser().getIsActive());
+    }
+
+    @When("trainee {string} sends a request with valid JWT token to change the status to active")
+    public void traineeSendsARequestWithValidJWTTokenToChangeTheStatusToActive(String username) throws JSONException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + tokenOfLoggedInTrainee);
+        JSONObject changeActivationStatusRequestBody = new JSONObject();
+        changeActivationStatusRequestBody.put("username", username);
+        changeActivationStatusRequestBody.put("isActive", true);
+        HttpEntity<String> requestEntity = new HttpEntity<>(changeActivationStatusRequestBody.toString(), headers);
+        traineeActivationStatusResponse = restTemplate.exchange("http://localhost:8080/api/trainees/" +
+                username, HttpMethod.PATCH, requestEntity, Void.class);
+    }
+
+    @Then("the status of trainee {string} is changed to active")
+    public void theStatusOfTraineeIsChangedToActive(String username) {
+        Assertions.assertEquals(HttpStatus.OK, traineeActivationStatusResponse.getStatusCode());
+        Trainee trainee = traineeRepository.findByUsername(username).get();
+        Assertions.assertTrue(trainee.getUser().getIsActive());
     }
 }

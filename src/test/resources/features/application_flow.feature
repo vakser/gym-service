@@ -32,3 +32,17 @@ Feature: Gym microservice application flow
     And the trainee "John.Jones" is logged in
     When to view profile, trainee "John.Jones" sends a request with valid JWT token
     Then the response with a trainee profile returned to the user
+
+  Scenario: Changing activation status of a trainer
+    Given a trainer named "Mike.Tyson" exists in the database
+    And the trainer "Mike.Tyson" is logged in
+    And the status of trainer "Mike.Tyson" is inactive
+    When trainer "Mike.Tyson" sends a request with valid JWT token to change the status to active
+    Then the status of trainer "Mike.Tyson" is changed to active
+
+  Scenario: Changing activation status of a trainee
+    Given a trainee named "John.Jones" exists in the database
+    And the trainee "John.Jones" is logged in
+    And the status of trainee "John.Jones" is inactive
+    When trainee "John.Jones" sends a request with valid JWT token to change the status to active
+    Then the status of trainee "John.Jones" is changed to active
