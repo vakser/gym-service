@@ -33,7 +33,7 @@ public class GymMicroserviceApplicationFlowSteps {
     private static String passwordOfRegisteredTrainee;
     private static String tokenOfLoggedInTrainer;
     private static String tokenOfLoggedInTrainee;
-    TestRestTemplate restTemplate = new TestRestTemplate();
+    private final TestRestTemplate restTemplate = new TestRestTemplate();
     @Autowired
     private TrainerRepository trainerRepository;
     @Autowired
@@ -69,6 +69,24 @@ public class GymMicroserviceApplicationFlowSteps {
         Assertions.assertEquals(usernameThatShouldBeCreated, trainerProfileCreatedResponse.getBody().getUsername(),
                 "Response body should contain username Mike.Tyson");
         Assertions.assertFalse(trainerRepository.findByUsername("Mike.Tyson").isEmpty());
+    }
+
+    @When("the user sends an invalid request to register as a trainer")
+    public void theUserSendsAnInvalidRequestToRegisterAsATrainer() throws JSONException {
+        trainerRegistrationRequestJson = new JSONObject();
+        trainerRegistrationRequestJson.put("firstName", null);
+        trainerRegistrationRequestJson.put("lastName", null);
+        trainerRegistrationRequestJson.put("specializationId", null);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(trainerRegistrationRequestJson.toString(), headers);
+        trainerProfileCreatedResponse = restTemplate.postForEntity("http://localhost:8080/api/trainers", request, ProfileCreatedResponse.class);
+    }
+
+    @Then("the user is not registered as a trainer and receives response with bad request status")
+    public void theUserReceivesResponseWithBadRequestStatus() {
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, trainerProfileCreatedResponse.getStatusCode(),
+                "ProfileCreated response status should be 400");
     }
 
     @Given("a trainer named {string} exists in the database")
@@ -122,6 +140,22 @@ public class GymMicroserviceApplicationFlowSteps {
         Assertions.assertEquals("Tyson", trainerProfileResponse.getBody().getLastName());
     }
 
+    @When("to view profile, trainer sends a request with valid JWT token but other username than own")
+    public void toViewProfileTrainerSendsARequestWithValidJWTTokenButOtherUsernameThanOwn() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + tokenOfLoggedInTrainer);
+        HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
+        trainerProfileResponse = restTemplate.exchange("http://localhost:8080/api/trainers/Other.Trainer",
+                HttpMethod.GET, requestEntity, GetTrainerProfileResponse.class);
+    }
+
+    @Then("the response with forbidden status returned to the trainer")
+    public void theResponseWithForbiddenStatusReturnedToTheTrainer() {
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, trainerProfileResponse.getStatusCode(),
+                "Http Status Code 403 Forbidden should have been returned");
+    }
+
     @Given("a user wants to register as a trainee")
     public void aUserWantsToRegisterAsATrainee() {
 
@@ -150,6 +184,24 @@ public class GymMicroserviceApplicationFlowSteps {
         Assertions.assertEquals(usernameThatShouldBeCreated, traineeProfileCreatedResponse.getBody().getUsername(),
                 "Response body should contain username John.Jones");
         Assertions.assertFalse(traineeRepository.findByUsername("John.Jones").isEmpty());
+    }
+
+    @When("the user sends an invalid request to register as a trainee")
+    public void theUserSendsAnInvalidRequestToRegisterAsATrainee() throws JSONException {
+        traineeRegistrationRequestJson = new JSONObject();
+        traineeRegistrationRequestJson.put("firstName", null);
+        traineeRegistrationRequestJson.put("lastName", null);
+        traineeRegistrationRequestJson.put("specializationId", null);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(traineeRegistrationRequestJson.toString(), headers);
+        traineeProfileCreatedResponse = restTemplate.postForEntity("http://localhost:8080/api/trainees", request, ProfileCreatedResponse.class);
+    }
+
+    @Then("the user is not registered as a trainee and receives response with bad request status")
+    public void theUserIsNotRegisteredAsATraineeAndReceivesResponseWithBadRequestStatus() {
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, traineeProfileCreatedResponse.getStatusCode(),
+                "ProfileCreated response status should be 400");
     }
 
     @Given("a trainee named {string} exists in the database")
@@ -203,8 +255,24 @@ public class GymMicroserviceApplicationFlowSteps {
         Assertions.assertEquals("Jones", traineeProfileResponse.getBody().getLastName());
     }
 
+    @When("to view profile, trainee sends a request with valid JWT token but other username than own")
+    public void toViewProfileTraineeSendsARequestWithValidJWTTokenButOtherUsernameThanOwn() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + tokenOfLoggedInTrainee);
+        HttpEntity<String> requestEntity = new HttpEntity<>(null, headers);
+        traineeProfileResponse = restTemplate.exchange("http://localhost:8080/api/trainees/Other.Trainee",
+                HttpMethod.GET, requestEntity, GetTraineeProfileResponse.class);
+    }
+
+    @Then("the response with forbidden status returned to the trainee")
+    public void theResponseWithForbiddenStatusReturnedToTheTrainee() {
+        Assertions.assertEquals(HttpStatus.FORBIDDEN, traineeProfileResponse.getStatusCode(),
+                "Http Status Code 403 Forbidden should have been returned");
+    }
+
     @And("the status of trainer {string} is inactive")
-    public void theStatusOfTrainerIsInactive(String username) throws JSONException {
+    public void theStatusOfTrainerIsInactive(String username) {
         Trainer trainer = trainerRepository.findByUsername(username).get();
         Assertions.assertFalse(trainer.getUser().getIsActive());
     }
@@ -254,4 +322,5 @@ public class GymMicroserviceApplicationFlowSteps {
         Trainee trainee = traineeRepository.findByUsername(username).get();
         Assertions.assertTrue(trainee.getUser().getIsActive());
     }
+
 }

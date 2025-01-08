@@ -45,6 +45,7 @@ public class TraineeController {
 
     @Operation(summary = "Register Trainee", description = "Is used to save trainee into database")
     @ApiResponse(responseCode = "201", description = "New trainee profile created")
+    @ApiResponse(responseCode = "400", description = "Invalid request has been sent")
     @PostMapping()
     public ResponseEntity<ProfileCreatedResponse> registerTrainee(@Valid @RequestBody TraineeRegistrationRequest traineeRegistrationRequest) {
         UserResponse trainee = registerTraineeTimer.record(() -> traineeService.createTrainee(traineeRegistrationRequest));
@@ -56,7 +57,6 @@ public class TraineeController {
     @Operation(summary = "Get Trainee Profile", description = "Is used to fetch information about trainee from database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Trainee found"),
-            @ApiResponse(responseCode = "404", description = "Trainee not found", content = @Content),
             @ApiResponse(responseCode = "401", description = "Request lacks valid authentication credentials", content = @Content),
             @ApiResponse(responseCode = "403", description = "Access to requested resource forbidden", content = @Content)
     })

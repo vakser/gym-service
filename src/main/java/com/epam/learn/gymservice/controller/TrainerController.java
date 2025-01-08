@@ -34,6 +34,7 @@ public class TrainerController {
 
     @Operation(summary = "Register Trainer", description = "Is used to save trainer into database")
     @ApiResponse(responseCode = "201", description = "Http Status 201 CREATED")
+    @ApiResponse(responseCode = "400", description = "Invalid request has been sent")
     @PostMapping()
     public ResponseEntity<ProfileCreatedResponse> registerTrainer(@Valid @RequestBody TrainerRegistrationRequest trainerRegistrationRequest) {
         UserResponse trainer = trainerService.createTrainer(trainerRegistrationRequest);
@@ -45,7 +46,6 @@ public class TrainerController {
     @Operation(summary = "Get Trainer Profile", description = "Is used to fetch information about trainer from database")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Trainer found"),
-            @ApiResponse(responseCode = "404", description = "Trainer not found", content = @Content),
             @ApiResponse(responseCode = "401", description = "Request lacks valid authentication credentials", content = @Content),
             @ApiResponse(responseCode = "403", description = "Access to requested resource forbidden", content = @Content)
     })
