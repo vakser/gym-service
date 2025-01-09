@@ -67,3 +67,15 @@ Feature: Gym microservice application flow
     And the status of trainee "John.Jones" is inactive
     When trainee "John.Jones" sends a request with valid JWT token to change the status to active
     Then the status of trainee "John.Jones" is changed to active
+
+  Scenario: Changing password of logged in trainer
+    Given a trainer named "Mike.Tyson" exists in the database
+    And the trainer "Mike.Tyson" is logged in
+    When trainer "Mike.Tyson" sends a request with valid JWT token to change password
+    Then the password of trainer is changed
+
+  Scenario: Changing password of logged in trainee
+    Given a trainee named "John.Jones" exists in the database
+    And the trainee "John.Jones" is logged in
+    When trainee "John.Jones" sends a request with valid JWT token to change password
+    Then the password of trainee is changed

@@ -25,6 +25,8 @@ public class GymMicroserviceApplicationFlowSteps {
     private ResponseEntity<ProfileCreatedResponse> traineeProfileCreatedResponse;
     private ResponseEntity<Void> trainerActivationStatusResponse;
     private ResponseEntity<Void> traineeActivationStatusResponse;
+    private ResponseEntity<Void> changeTrainerPasswordResponse;
+    private ResponseEntity<Void> changeTraineePasswordResponse;
     private ResponseEntity<GetTrainerProfileResponse> trainerProfileResponse;
     private ResponseEntity<GetTraineeProfileResponse> traineeProfileResponse;
     private JSONObject trainerRegistrationRequestJson;
@@ -323,4 +325,43 @@ public class GymMicroserviceApplicationFlowSteps {
         Assertions.assertTrue(trainee.getUser().getIsActive());
     }
 
+    @When("trainer {string} sends a request with valid JWT token to change password")
+    public void trainerSendsARequestWithValidJWTTokenToChangePassword(String username) throws JSONException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + tokenOfLoggedInTrainer);
+        JSONObject changePasswordRequestBody = new JSONObject();
+        changePasswordRequestBody.put("username", username);
+        Trainer trainer = trainerRepository.findByUsername(username).get();
+        changePasswordRequestBody.put("oldPassword", trainer.getUser().getPassword());
+        changePasswordRequestBody.put("newPassword", "12345");
+        HttpEntity<String> requestEntity = new HttpEntity<>(changePasswordRequestBody.toString(), headers);
+        changeTrainerPasswordResponse = restTemplate.exchange("http://localhost:8080/api/auth/change-password",
+                HttpMethod.PUT, requestEntity, Void.class);
+    }
+
+    @Then("the password of trainer is changed")
+    public void thePasswordOfTrainerIsChanged() {
+        Assertions.assertEquals(HttpStatus.OK, changeTrainerPasswordResponse.getStatusCode());
+    }
+
+    @When("trainee {string} sends a request with valid JWT token to change password")
+    public void traineeSendsARequestWithValidJWTTokenToChangePassword(String username) throws JSONException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + tokenOfLoggedInTrainee);
+        JSONObject changePasswordRequestBody = new JSONObject();
+        changePasswordRequestBody.put("username", username);
+        Trainee trainee = traineeRepository.findByUsername(username).get();
+        changePasswordRequestBody.put("oldPassword", trainee.getUser().getPassword());
+        changePasswordRequestBody.put("newPassword", "12345");
+        HttpEntity<String> requestEntity = new HttpEntity<>(changePasswordRequestBody.toString(), headers);
+        changeTraineePasswordResponse = restTemplate.exchange("http://localhost:8080/api/auth/change-password",
+                HttpMethod.PUT, requestEntity, Void.class);
+    }
+
+    @Then("the password of trainee is changed")
+    public void thePasswordOfTraineeIsChanged() {
+        Assertions.assertEquals(HttpStatus.OK, changeTraineePasswordResponse.getStatusCode());
+    }
 }
