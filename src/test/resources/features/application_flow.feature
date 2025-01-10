@@ -79,3 +79,13 @@ Feature: Gym microservice application flow
     And the trainee "John.Jones" is logged in
     When trainee "John.Jones" sends a request with valid JWT token to change password
     Then the password of trainee is changed
+
+  Scenario: Trainer logging in with a new password
+    Given a trainer named "Mike.Tyson" exists in the database
+    When the trainer "Mike.Tyson" wants to log in providing correct credentials
+    Then trainer is successfully authenticated
+
+  Scenario: Trainee logging in with a new password
+    Given a trainee named "John.Jones" exists in the database
+    When the trainee "John.Jones" wants to log in providing correct credentials
+    Then trainee is successfully authenticated

@@ -29,6 +29,8 @@ public class GymMicroserviceApplicationFlowSteps {
     private ResponseEntity<Void> changeTraineePasswordResponse;
     private ResponseEntity<GetTrainerProfileResponse> trainerProfileResponse;
     private ResponseEntity<GetTraineeProfileResponse> traineeProfileResponse;
+    private ResponseEntity<AuthResponse> trainerAuthResponse;
+    private ResponseEntity<AuthResponse> traineeAuthResponse;
     private JSONObject trainerRegistrationRequestJson;
     private JSONObject traineeRegistrationRequestJson;
     private static String passwordOfRegisteredTrainer;
@@ -363,5 +365,41 @@ public class GymMicroserviceApplicationFlowSteps {
     @Then("the password of trainee is changed")
     public void thePasswordOfTraineeIsChanged() {
         Assertions.assertEquals(HttpStatus.OK, changeTraineePasswordResponse.getStatusCode());
+    }
+
+    @When("the trainer {string} wants to log in providing correct credentials")
+    public void theTrainerWantsToLogInProvidingCorrectCredentials(String username) throws JSONException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        JSONObject loginCredentials = new JSONObject();
+        loginCredentials.put("username", username);
+        loginCredentials.put("password", "12345");
+        HttpEntity<String> request = new HttpEntity<>(loginCredentials.toString(), headers);
+        trainerAuthResponse = restTemplate.postForEntity("http://localhost:8080/api/auth/login", request, AuthResponse.class);
+        tokenOfLoggedInTrainer = trainerAuthResponse.getBody().getToken();
+    }
+
+
+    @Then("trainer is successfully authenticated")
+    public void trainerIsSuccessfullyAuthenticated() {
+        Assertions.assertEquals(HttpStatus.OK, trainerAuthResponse.getStatusCode());
+    }
+
+    @When("the trainee {string} wants to log in providing correct credentials")
+    public void theTraineeWantsToLogInProvidingCorrectCredentials(String username) throws JSONException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        JSONObject loginCredentials = new JSONObject();
+        loginCredentials.put("username", username);
+        loginCredentials.put("password", "12345");
+        HttpEntity<String> request = new HttpEntity<>(loginCredentials.toString(), headers);
+        traineeAuthResponse = restTemplate.postForEntity("http://localhost:8080/api/auth/login", request, AuthResponse.class);
+        tokenOfLoggedInTrainee = traineeAuthResponse.getBody().getToken();
+    }
+
+
+    @Then("trainee is successfully authenticated")
+    public void traineeIsSuccessfullyAuthenticated() {
+        Assertions.assertEquals(HttpStatus.OK, traineeAuthResponse.getStatusCode());
     }
 }
