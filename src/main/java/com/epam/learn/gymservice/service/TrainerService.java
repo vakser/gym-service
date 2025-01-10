@@ -30,7 +30,6 @@ public class TrainerService {
     private final TrainingRepository trainingRepository;
     private final TraineeRepository traineeRepository;
     private final PasswordEncoder passwordEncoder;
-//    private final TrainerWorkloadServiceClient workloadServiceClient;
     private final WorkloadMessageProducer workloadMessageProducer;
 
     @Transactional
@@ -106,19 +105,19 @@ public class TrainerService {
             log.warn("The trainee {} have not requested the training by the trainer {}", trainee.getUser().getUsername(), trainer.getUser().getUsername());
             return;
         }
-        List<Training> trainerTrainings = trainingRepository.findAll();
-        for (Training training : trainerTrainings) {
-            if (training.getTrainingDate().equals(addTrainingRequest.getTrainingDate())) {
-                log.warn("There is already a training {} with trainee {} scheduled for the same date {}",
-                        training.getTrainingName(), trainee.getUser().getUsername(), training.getTrainingDate());
-                return;
-            }
-            // ask if local date and time supposed to be used instead of just local date ???
+//        List<Training> trainerTrainings = trainingRepository.findAll();
+//        for (Training training : trainerTrainings) {
+//            if (training.getTrainingDate().equals(addTrainingRequest.getTrainingDate())) {
+//                log.warn("There is already a training {} with trainee {} scheduled for the same date {}",
+//                        training.getTrainingName(), trainee.getUser().getUsername(), training.getTrainingDate());
+//                return;
+//            }
+//            // ask if local date and time supposed to be used instead of just local date ???
 //            if (training.getTrainingDate().plus(training.getTrainingDuration(), ChronoUnit.MINUTES).isAfter(addTrainingRequest.getTrainingDate())) {
 //                log.warn("The requested trainee training overlapping with already assigned training");
 //                return;
 //            }
-        }
+//        }
         Training training = new Training();
         training.setTrainee(trainee);
         training.setTrainer(trainer);
